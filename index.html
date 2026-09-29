@@ -1,0 +1,745 @@
+<!DOCTYPE html>
+<html lang="en" class="h-full bg-[#090d16] text-slate-100">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MACRS Investment Property Depreciation Calculator | Bharrys Financial Suite</title>
+    <!-- GoatCounter Analytics Tracker -->
+    <script 
+        data-goatcounter="https://bharrys.goatcounter.com/count" 
+        async 
+        src="//gc.zgo.at/count.js" 
+        id="goatcounter-script"
+        onload="window.goatcounterLoaded = true;"
+        onerror="window.goatcounterBlocked = true;">
+    </script>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        brand: {
+                            dark: '#090d16',
+                            card: '#111827',
+                            border: 'rgba(255, 255, 255, 0.08)',
+                            cyan: '#38bdf8',
+                            indigo: '#818cf8',
+                            emerald: '#34d399',
+                            amber: '#fbbf24'
+                        }
+                    },
+                    boxShadow: {
+                        glow: '0 0 25px -5px rgba(56, 189, 248, 0.15)',
+                        'glow-emerald': '0 0 25px -5px rgba(52, 211, 153, 0.2)'
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        .glass-panel {
+            background: rgba(17, 24, 39, 0.75);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+        }
+        .glass-card-invest {
+            background: rgba(15, 23, 42, 0.6);
+            border: 1px solid rgba(52, 211, 153, 0.25);
+        }
+        ::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #0f172a;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #334155;
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #475569;
+        }
+
+        /* Print Optimization Styles */
+        @media print {
+            body {
+                background: #ffffff !important;
+                color: #000000 !important;
+            }
+            header, footer, .no-print {
+                display: none !important;
+            }
+            .glass-panel, .glass-card-invest {
+                background: #ffffff !important;
+                border: 1px solid #cccccc !important;
+                box-shadow: none !important;
+                color: #000000 !important;
+            }
+            text, h1, h2, h3, h4, span, p, td, th {
+                color: #000000 !important;
+            }
+            input, select {
+                border: 1px solid #999999 !important;
+                background: #ffffff !important;
+                color: #000000 !important;
+            }
+            .no-page-break {
+                page-break-inside: avoid;
+            }
+            table {
+                page-break-inside: auto;
+            }
+            tr {
+                page-break-inside: avoid;
+                page-break-after: auto;
+            }
+        }
+    </style>
+</head>
+<body class="min-h-full flex flex-col font-sans antialiased selection:bg-emerald-500 selection:text-black bg-[#090d16] text-slate-100">
+
+    <!-- Background Glow Effects -->
+    <div class="fixed inset-0 pointer-events-none overflow-hidden z-0 no-print">
+        <div class="absolute -top-40 -left-40 w-96 h-96 bg-emerald-500/10 rounded-full blur-3xl"></div>
+        <div class="absolute top-1/3 -right-40 w-96 h-96 bg-cyan-500/10 rounded-full blur-3xl"></div>
+        <div class="absolute -bottom-40 left-1/3 w-96 h-96 bg-indigo-500/5 rounded-full blur-3xl"></div>
+    </div>
+
+    <!-- Header Navbar -->
+    <header class="relative z-10 border-b border-slate-800/80 bg-[#090d16]/80 backdrop-blur-md sticky top-0">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3.5 flex items-center justify-between">
+            <div class="flex items-center gap-3">
+                <a href="https://financialhub.bharrys.com" class="p-2.5 bg-slate-900 border border-slate-700/60 rounded-xl text-emerald-400 hover:border-emerald-400 transition shadow-glow">
+                    <i data-lucide="building-2" class="w-6 h-6"></i>
+                </a>
+                <div>
+                    <div class="flex items-center gap-2">
+                        <h1 class="text-lg sm:text-xl font-extrabold tracking-tight text-white font-mono">BHARRYS <span class="text-emerald-400">FINANCIAL</span></h1>
+                        <span class="text-[10px] font-mono font-semibold px-2 py-0.5 rounded-full bg-emerald-950/80 text-emerald-400 border border-emerald-800/50">REAL ESTATE MACRS</span>
+                    </div>
+                    <p class="text-xs text-slate-400 mt-0.5">Investment Property Depreciation & Tax Shield Engine</p>
+                </div>
+            </div>
+
+            <div class="flex items-center gap-2 sm:gap-3">
+                <button type="button" onclick="shareConfiguration()" class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-slate-900 border border-slate-700 text-xs font-semibold text-cyan-400 hover:text-white hover:border-cyan-500 transition cursor-pointer">
+                    <i data-lucide="share-2" class="w-3.5 h-3.5"></i>
+                    <span id="share-btn-text">Share</span>
+                </button>
+
+                <button type="button" onclick="window.print()" class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-slate-900 border border-slate-700 text-xs font-semibold text-emerald-400 hover:text-white hover:border-emerald-500 transition cursor-pointer">
+                    <i data-lucide="printer" class="w-3.5 h-3.5"></i>
+                    <span>Print Schedule</span>
+                </button>
+
+                <a href="https://financialhub.bharrys.com" class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-slate-900 border border-slate-700 text-xs font-semibold text-slate-300 hover:text-white hover:border-slate-600 transition">
+                    <i data-lucide="arrow-left" class="w-3.5 h-3.5"></i>
+                    <span>Suite Hub</span>
+                </a>
+            </div>
+        </div>
+    </header>
+
+    <main class="relative z-10 flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8">
+
+        <!-- Hero Banner with Presets -->
+        <section class="glass-panel rounded-3xl p-6 sm:p-8 space-y-6">
+            <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-6">
+                <div>
+                    <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-slate-900 border border-slate-700/80 text-xs font-medium text-emerald-400 mb-2">
+                        <i data-lucide="sparkles" class="w-3.5 h-3.5"></i>
+                        <span>IRS Pub 527 Real Property Recovery Engine</span>
+                    </div>
+                    <h2 class="text-2xl sm:text-3xl font-extrabold text-white tracking-tight">
+                        Property Depreciation <span class="bg-gradient-to-r from-emerald-400 to-cyan-400 bg-clip-text text-transparent">& Tax Shield Calculator</span>
+                    </h2>
+                    <p class="text-xs sm:text-sm text-slate-400 mt-1 max-w-2xl">
+                        Compute annual tax deductions, building cost basis write-offs, and residual property tax basis using MACRS Mid-Month Straight Line recovery rules.
+                    </p>
+                </div>
+
+                <!-- Asset Property Presets -->
+                <div class="flex flex-col sm:flex-row items-start sm:items-center gap-2 w-full lg:w-auto shrink-0 no-print">
+                    <span class="text-xs font-mono text-slate-400 whitespace-nowrap">Property Presets:</span>
+                    <div class="flex flex-wrap gap-2 w-full sm:w-auto">
+                        <button type="button" onclick="loadPreset('single_family')" class="px-3 py-1.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-xs font-semibold text-cyan-400 border border-slate-700 transition">
+                            Single Family ($300k)
+                        </button>
+                        <button type="button" onclick="loadPreset('duplex')" class="px-3 py-1.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-xs font-semibold text-emerald-400 border border-slate-700 transition">
+                            Multi-Family ($550k)
+                        </button>
+                        <button type="button" onclick="loadPreset('commercial')" class="px-3 py-1.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-xs font-semibold text-amber-400 border border-slate-700 transition">
+                            Commercial ($1.2M)
+                        </button>
+                        <button type="button" onclick="loadPreset('industrial')" class="px-3 py-1.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-xs font-semibold text-indigo-400 border border-slate-700 transition">
+                            Industrial ($2.5M)
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Executive Summary Banner -->
+        <section id="summary-banner" class="glass-panel rounded-3xl p-6 relative overflow-hidden border-emerald-500/30">
+            <div class="flex flex-col lg:flex-row items-center justify-between gap-6">
+                <!-- Main Portfolio Highlight -->
+                <div class="flex items-start gap-4 w-full lg:w-1/2">
+                    <div class="p-3.5 rounded-2xl bg-emerald-500/10 text-emerald-400 border border-emerald-500/30 shrink-0">
+                        <i data-lucide="landmark" class="w-8 h-8"></i>
+                    </div>
+                    <div>
+                        <span class="text-[10px] font-mono uppercase tracking-wider font-bold text-emerald-400 bg-emerald-950 px-2.5 py-0.5 rounded-md border border-emerald-800">Tax Shield Summary</span>
+                        <h3 id="summary-tax-savings" class="text-2xl font-extrabold text-white mt-1">$0</h3>
+                        <p id="summary-deduction-desc" class="text-xs text-slate-300 mt-1 leading-relaxed">
+                            Total estimated income tax savings over the recovery life across <span class="text-emerald-400 font-bold" id="summary-building-basis">$0</span> of depreciable building basis.
+                        </p>
+                    </div>
+                </div>
+
+                <!-- Key Metrics Pill Grid -->
+                <div class="grid grid-cols-2 sm:grid-cols-3 gap-3 w-full lg:w-1/2 text-xs font-mono">
+                    <div class="p-3 bg-slate-900/80 rounded-2xl border border-slate-800">
+                        <span class="text-[10px] text-slate-400">Depreciable Basis</span>
+                        <p class="text-base font-extrabold text-cyan-400 mt-0.5" id="sum-depreciable-basis">$0</p>
+                    </div>
+                    <div class="p-3 bg-slate-900/80 rounded-2xl border border-slate-800">
+                        <span class="text-[10px] text-slate-400" id="sum-current-year-label">Current Year Write-Off</span>
+                        <p class="text-base font-extrabold text-emerald-400 mt-0.5" id="sum-current-year-deduction">$0</p>
+                    </div>
+                    <div class="p-3 bg-slate-900/80 rounded-2xl border border-slate-800 col-span-2 sm:col-span-1">
+                        <span class="text-[10px] text-slate-400">Non-Depreciable Land</span>
+                        <p class="text-base font-extrabold text-amber-400 mt-0.5" id="sum-land-basis">$0</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- TWO COLUMN INPUT & VISUAL BREAKDOWN AREA -->
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+
+            <!-- LEFT COLUMN: INPUT PARAMETERS (5 Cols) -->
+            <div class="lg:col-span-5 glass-card-invest rounded-3xl p-5 space-y-4">
+                <div class="flex items-center gap-2.5 pb-2.5 border-b border-emerald-500/20">
+                    <div class="p-1.5 rounded-xl bg-emerald-500/10 text-emerald-400 border border-emerald-500/30">
+                        <i data-lucide="sliders" class="w-4 h-4"></i>
+                    </div>
+                    <div>
+                        <h3 class="text-sm font-bold text-white">Property & Tax Parameters</h3>
+                        <p class="text-[10px] text-slate-400">Configure acquisition cost & MACRS options</p>
+                    </div>
+                </div>
+
+                <!-- Parameters Form Grid -->
+                <div class="grid grid-cols-2 gap-3 text-xs">
+                    <!-- Property Total Purchase Price -->
+                    <div class="col-span-2 sm:col-span-1">
+                        <label class="block text-[11px] font-semibold text-slate-300 mb-1">Total Purchase Price ($)</label>
+                        <div class="relative">
+                            <span class="absolute left-3 top-1/2 -translate-y-1/2 text-slate-500 font-mono">$</span>
+                            <input type="number" id="input-cost" value="400000" step="5000" min="0" oninput="calculateAll()" class="w-full pl-7 pr-3 py-1.5 bg-slate-900 border border-emerald-500/40 rounded-xl text-white font-mono font-bold text-xs outline-none focus:border-emerald-400 transition">
+                        </div>
+                    </div>
+
+                    <!-- Date Placed In Service -->
+                    <div class="col-span-2 sm:col-span-1">
+                        <label class="block text-[11px] font-semibold text-slate-300 mb-1">Date In Service</label>
+                        <input type="date" id="input-service-date" onchange="calculateAll()" class="w-full px-2.5 py-1.5 bg-slate-900 border border-slate-700 rounded-xl text-white font-mono font-bold text-xs outline-none focus:border-emerald-400 transition">
+                    </div>
+
+                    <!-- Land Allocation % -->
+                    <div>
+                        <label class="block text-[11px] font-semibold text-slate-300 mb-1 flex items-center justify-between">
+                            <span>Land Allocation</span>
+                            <span class="text-amber-400 font-mono font-bold" id="land-pct-label">20%</span>
+                        </label>
+                        <div class="relative">
+                            <input type="number" id="input-land-pct" value="20" min="0" max="95" step="1" oninput="syncLandPctInput()" class="w-full pr-6 pl-2.5 py-1.5 bg-slate-900 border border-slate-700 rounded-xl text-white font-mono font-bold text-xs outline-none focus:border-emerald-400 transition">
+                            <span class="absolute right-2.5 top-1/2 -translate-y-1/2 text-slate-500 font-mono text-[10px]">%</span>
+                        </div>
+                    </div>
+
+                    <!-- Land Allocation $ Value -->
+                    <div>
+                        <label class="block text-[11px] font-semibold text-slate-300 mb-1">Land Value ($)</label>
+                        <div class="relative">
+                            <span class="absolute left-3 top-1/2 -translate-y-1/2 text-slate-500 font-mono">$</span>
+                            <input type="number" id="input-land-val" value="80000" step="1000" min="0" oninput="syncLandValInput()" class="w-full pl-7 pr-3 py-1.5 bg-slate-900 border border-slate-700 rounded-xl text-white font-mono font-bold text-xs outline-none focus:border-emerald-400 transition">
+                        </div>
+                    </div>
+
+                    <!-- Property Type (Class Life) -->
+                    <div class="col-span-2">
+                        <label class="block text-[11px] font-semibold text-slate-300 mb-1">IRS Property Class Life</label>
+                        <select id="input-property-type" onchange="calculateAll()" class="w-full px-2.5 py-1.5 bg-slate-900 border border-slate-700 rounded-xl text-white font-mono font-semibold text-xs outline-none focus:border-emerald-400 transition">
+                            <option value="residential" selected>Residential Rental Property (27.5-Year SL)</option>
+                            <option value="commercial">Nonresidential Commercial Property (39-Year SL)</option>
+                        </select>
+                    </div>
+
+                    <!-- Business / Rental Use % -->
+                    <div>
+                        <label class="block text-[11px] font-semibold text-slate-300 mb-1 flex items-center justify-between">
+                            <span>Rental Use %</span>
+                            <span class="text-emerald-400 font-mono font-bold" id="business-use-label">100%</span>
+                        </label>
+                        <div class="relative">
+                            <input type="number" id="input-business-pct" value="100" min="1" max="100" oninput="syncBusinessSlider()" class="w-full pr-6 pl-2.5 py-1.5 bg-slate-900 border border-slate-700 rounded-xl text-white font-mono font-bold text-xs outline-none focus:border-emerald-400 transition">
+                            <span class="absolute right-2.5 top-1/2 -translate-y-1/2 text-slate-500 font-mono text-[10px]">%</span>
+                        </div>
+                    </div>
+
+                    <!-- Tax Bracket Rate -->
+                    <div>
+                        <label class="block text-[11px] font-semibold text-slate-300 mb-1 flex items-center justify-between">
+                            <span>Tax Bracket</span>
+                            <span class="text-cyan-400 font-mono font-bold" id="tax-rate-label">32.0%</span>
+                        </label>
+                        <div class="relative">
+                            <input type="number" id="input-tax-rate" value="32.0" step="0.5" min="0" max="60" oninput="syncTaxSlider()" class="w-full pr-6 pl-2.5 py-1.5 bg-slate-900 border border-slate-700 rounded-xl text-white font-mono font-bold text-xs outline-none focus:border-emerald-400 transition">
+                            <span class="absolute right-2.5 top-1/2 -translate-y-1/2 text-slate-500 font-mono text-[10px]">%</span>
+                        </div>
+                    </div>
+
+                    <!-- Business Use Slider -->
+                    <div class="col-span-2">
+                        <input type="range" id="slider-business-pct" min="1" max="100" value="100" step="1" oninput="syncBusinessInput()" class="w-full accent-emerald-400 cursor-pointer no-print">
+                    </div>
+                </div>
+
+                <!-- Output Summary Sidebar -->
+                <div class="pt-3 border-t border-emerald-500/20 bg-slate-900/80 rounded-2xl p-3.5 space-y-2 font-mono text-xs">
+                    <h4 class="text-slate-400 font-bold uppercase tracking-wider text-[10px]">Basis Allocation & Write-Off Summary</h4>
+
+                    <div class="flex justify-between items-center py-0.5 border-b border-slate-800">
+                        <span class="text-slate-400">Total Purchase Price</span>
+                        <span class="text-white font-bold" id="out-initial-cost">$400,000</span>
+                    </div>
+
+                    <div class="flex justify-between items-center py-0.5 border-b border-slate-800">
+                        <span class="text-slate-400">Land Basis (Non-Depreciable)</span>
+                        <span class="text-amber-400 font-bold" id="out-land-basis">$80,000</span>
+                    </div>
+
+                    <div class="flex justify-between items-center py-0.5 border-b border-slate-800">
+                        <span class="text-slate-400">Building Basis (Total)</span>
+                        <span class="text-cyan-400 font-bold" id="out-building-basis">$320,000</span>
+                    </div>
+
+                    <div class="flex justify-between items-center py-0.5 border-b border-slate-800">
+                        <span class="text-slate-400">Depreciable Rental Basis</span>
+                        <span class="text-emerald-400 font-bold" id="out-eligible-basis">$320,000</span>
+                    </div>
+
+                    <div class="flex justify-between items-center py-0.5 border-b border-slate-800">
+                        <span class="text-slate-400" id="out-current-year-title">Current Year Deduction</span>
+                        <span class="text-amber-400 font-bold" id="out-current-year-deduction">$0</span>
+                    </div>
+
+                    <div class="flex justify-between items-center py-0.5 border-b border-slate-800">
+                        <span class="text-slate-400">Full Year Annual Deduction</span>
+                        <span class="text-emerald-300 font-bold" id="out-full-year-deduction">$11,636</span>
+                    </div>
+
+                    <div class="flex justify-between items-center pt-1 text-xs bg-emerald-950/40 p-2 rounded-xl border border-emerald-800/40">
+                        <span class="text-emerald-300 font-bold">Est. Total Life Tax Savings</span>
+                        <span class="text-emerald-400 font-extrabold text-sm" id="out-tax-savings">$102,400</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- RIGHT COLUMN: VISUAL COMPARISON BARS (7 Cols) -->
+            <div class="lg:col-span-7 space-y-6">
+
+                <!-- Visual Breakdown Bar Comparison -->
+                <div class="glass-panel rounded-3xl p-6 space-y-6">
+                    <div class="flex items-center justify-between border-b border-slate-800 pb-4">
+                        <div class="flex items-center gap-2">
+                            <i data-lucide="bar-chart-3" class="w-5 h-5 text-emerald-400"></i>
+                            <h3 class="text-base font-bold text-white">Value Breakdown & Tax Shield</h3>
+                        </div>
+                        <span class="text-xs text-slate-400">IRS Recovery Class: <span class="font-mono text-white" id="bar-class-label">27.5-Year SL</span></span>
+                    </div>
+
+                    <div class="space-y-6 text-xs font-mono">
+                        <div class="space-y-2">
+                            <div class="flex justify-between text-slate-300 font-sans font-semibold">
+                                <span>Purchase Price Capital Allocation</span>
+                                <span id="bar-tax-ratio" class="text-emerald-400 font-mono">Tax Savings: 25.6%</span>
+                            </div>
+                            <div class="h-8 bg-slate-900 rounded-xl border border-slate-800 flex overflow-hidden p-1 gap-1">
+                                <div id="bar-savings" class="bg-emerald-400 rounded-lg flex items-center justify-center text-black font-extrabold transition-all duration-500 overflow-hidden" style="width: 25.6%;">
+                                    <span id="bar-savings-val" class="text-[10px] px-1 truncate">$102,400</span>
+                                </div>
+                                <div id="bar-building" class="bg-cyan-500 rounded-lg flex items-center justify-center text-black font-extrabold transition-all duration-500 overflow-hidden" style="width: 54.4%;">
+                                    <span id="bar-building-val" class="text-[10px] px-1 truncate">$217,600</span>
+                                </div>
+                                <div id="bar-land" class="bg-amber-400 rounded-lg flex items-center justify-center text-black font-extrabold transition-all duration-500 overflow-hidden" style="width: 20%;">
+                                    <span id="bar-land-val" class="text-[10px] px-1 truncate">$80,000</span>
+                                </div>
+                            </div>
+                            <div class="flex flex-wrap gap-x-4 gap-y-1 text-[10px] text-slate-400 font-mono pt-1">
+                                <span class="text-emerald-400">■ IRS Tax Savings Shield</span>
+                                <span class="text-cyan-400">■ Net Depreciable Cost (After Tax)</span>
+                                <span class="text-amber-400">■ Non-Depreciable Land Basis</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+
+        </div>
+
+        <!-- FULL-WIDTH FREELY FLOWING MACRS DEPRECIATION SCHEDULE TABLE -->
+        <section class="glass-panel rounded-3xl p-6 sm:p-8 space-y-6">
+            <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 border-b border-slate-800 pb-4">
+                <div class="flex items-center gap-3">
+                    <div class="p-2 rounded-xl bg-cyan-500/10 text-cyan-400 border border-cyan-500/30">
+                        <i data-lucide="table" class="w-5 h-5"></i>
+                    </div>
+                    <div>
+                        <h3 class="text-lg font-bold text-white">MACRS Real Property Depreciation Schedule</h3>
+                        <p class="text-xs text-slate-400">Complete multi-year breakdown using Mid-Month Convention</p>
+                    </div>
+                </div>
+                <span class="text-xs text-slate-400 font-mono bg-slate-900 px-3 py-1.5 rounded-xl border border-slate-800" id="table-total-years-label">28 Recovery Years (Mid-Month)</span>
+            </div>
+
+            <!-- Full Width Freely Flowing Table -->
+            <div class="w-full overflow-x-auto">
+                <table class="w-full text-left font-mono text-xs sm:text-sm">
+                    <thead class="bg-slate-900/90 text-slate-400 border-b border-slate-800 sticky top-14 backdrop-blur-md z-10">
+                        <tr>
+                            <th class="py-3 px-4 font-semibold">Tax Year</th>
+                            <th class="py-3 px-4 font-semibold">MACRS Rate</th>
+                            <th class="py-3 px-4 font-semibold">Annual Deduction</th>
+                            <th class="py-3 px-4 font-semibold">Tax Savings Shield</th>
+                            <th class="py-3 px-4 font-semibold text-right">Ending Book Basis</th>
+                        </tr>
+                    </thead>
+                    <tbody id="milestones-table-body" class="divide-y divide-slate-800/60 text-slate-300">
+                        <!-- Dynamic JS Injection -->
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
+        <!-- MACRS Strategy, Conventions & Real Estate Depreciation Reference -->
+        <section class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div class="glass-panel rounded-3xl p-6 space-y-4">
+                <div class="flex items-center gap-2 text-emerald-400 font-bold text-sm">
+                    <i data-lucide="calendar" class="w-4 h-4"></i>
+                    <span>Mid-Month Convention for Real Property</span>
+                </div>
+                <div class="space-y-3 text-xs text-slate-300 leading-relaxed">
+                    <p>
+                        Under IRS MACRS guidelines, all real property (residential rental and nonresidential commercial buildings) is subject to the <strong>Mid-Month Convention</strong>:
+                    </p>
+                    <ul class="space-y-2 list-disc list-inside text-slate-400">
+                        <li>
+                            <strong class="text-cyan-400">Prorated Placement:</strong> Property is treated as placed in service (or disposed of) in the middle of the month, regardless of the actual calendar date acquired.
+                        </li>
+                        <li>
+                            <strong class="text-amber-400">Year 1 & Final Year Calculation:</strong> The first year deduction is calculated as <code class="text-emerald-300 font-mono">(12 - Month + 0.5) / 12</code> of the full annual straight-line amount, with the remaining fraction recovered in the final tail year.
+                        </li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="glass-panel rounded-3xl p-6 space-y-4">
+                <div class="flex items-center gap-2 text-cyan-400 font-bold text-sm">
+                    <i data-lucide="calculator" class="w-4 h-4"></i>
+                    <span>Residential (27.5-Yr) vs Commercial (39-Yr)</span>
+                </div>
+                <div class="space-y-3 text-xs text-slate-300 leading-relaxed">
+                    <p>
+                        IRS Publication 527 classifies real estate assets into two primary recovery periods using Straight Line (SL) depreciation:
+                    </p>
+                    <ul class="space-y-2 list-disc list-inside text-slate-400">
+                        <li>
+                            <strong class="text-emerald-400">Residential Rental (27.5 Years):</strong> Properties where 80% or more of gross rental income comes from dwelling units. Full-year recovery rate is <strong>3.636%</strong> per year.
+                        </li>
+                        <li>
+                            <strong class="text-indigo-400">Nonresidential Commercial (39 Years):</strong> Office, retail, industrial, and warehouse space. Full-year recovery rate is <strong>2.564%</strong> per year.
+                        </li>
+                        <li>
+                            <strong class="text-amber-400">Land Exclusion:</strong> Land is non-depreciable. Land value must always be subtracted from total purchase price to determine eligible building basis.
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- Footer -->
+    <footer class="border-t border-slate-800/80 bg-[#090d16] text-slate-500 text-xs py-6 mt-auto relative z-10">
+        <div class="max-w-7xl mx-auto px-4 flex flex-col sm:flex-row justify-between items-center gap-3">
+            <p>&copy; <span id="year"></span> Bharrys Ventures. MACRS Real Estate Property Depreciation Calculator</p>
+        </div>
+    </footer>
+
+    <script>
+        // Exact IRS MACRS Real Property Depreciation Table Rates (Percentages in decimal)
+        // Mid-month convention standard tables for 27.5-year and 39-year straight line real property
+        function getMidMonthRate(monthPlacedInService, yearNum, propertyType) {
+            const isResidential = propertyType === 'residential';
+            const recoveryYears = isResidential ? 27.5 : 39;
+            const fullYearRate = 1 / recoveryYears; // 0.0363636... or 0.025641...
+            const totalCalendarYears = isResidential ? 28 : 40;
+
+            const monthIndex = Math.min(Math.max(monthPlacedInService, 1), 12);
+
+            if (yearNum === 1) {
+                // First year prorated by mid-month rule: (12.5 - monthIndex) / 12
+                const monthsInService = (12 - monthIndex) + 0.5;
+                return (monthsInService / 12) * fullYearRate;
+            } else if (yearNum === totalCalendarYears) {
+                // Final tail year gets the remaining balance fraction
+                const firstYearFraction = ((12 - monthIndex) + 0.5) / 12;
+                const finalYearFraction = 1 - firstYearFraction;
+                return finalYearFraction * fullYearRate;
+            } else if (yearNum > 1 && yearNum < totalCalendarYears) {
+                return fullYearRate;
+            }
+            return 0;
+        }
+
+        const formatCurrency = (val) => '$' + Math.round(val).toLocaleString('en-US');
+
+        function syncLandPctInput() {
+            const cost = parseFloat(document.getElementById('input-cost').value) || 0;
+            const landPct = parseFloat(document.getElementById('input-land-pct').value) || 0;
+            const landVal = (cost * landPct) / 100;
+            document.getElementById('input-land-val').value = Math.round(landVal);
+            calculateAll();
+        }
+
+        function syncLandValInput() {
+            const cost = parseFloat(document.getElementById('input-cost').value) || 0;
+            const landVal = parseFloat(document.getElementById('input-land-val').value) || 0;
+            const landPct = cost > 0 ? (landVal / cost) * 100 : 0;
+            document.getElementById('input-land-pct').value = landPct.toFixed(1);
+            calculateAll();
+        }
+
+        function syncBusinessSlider() {
+            const val = document.getElementById('input-business-pct').value;
+            document.getElementById('slider-business-pct').value = val;
+            calculateAll();
+        }
+
+        function syncBusinessInput() {
+            const val = document.getElementById('slider-business-pct').value;
+            document.getElementById('input-business-pct').value = val;
+            calculateAll();
+        }
+
+        function syncTaxSlider() {
+            calculateAll();
+        }
+
+        function loadPreset(preset) {
+            const costInput = document.getElementById('input-cost');
+            const landPctInput = document.getElementById('input-land-pct');
+            const propertyTypeInput = document.getElementById('input-property-type');
+
+            if (preset === 'single_family') {
+                costInput.value = 300000;
+                landPctInput.value = 20;
+                propertyTypeInput.value = 'residential';
+            } else if (preset === 'duplex') {
+                costInput.value = 550000;
+                landPctInput.value = 15;
+                propertyTypeInput.value = 'residential';
+            } else if (preset === 'commercial') {
+                costInput.value = 1200000;
+                landPctInput.value = 20;
+                propertyTypeInput.value = 'commercial';
+            } else if (preset === 'industrial') {
+                costInput.value = 2500000;
+                landPctInput.value = 25;
+                propertyTypeInput.value = 'commercial';
+            }
+
+            syncLandPctInput();
+        }
+
+        function shareConfiguration() {
+            const cost = document.getElementById('input-cost').value;
+            const serviceDate = document.getElementById('input-service-date').value;
+            const landPct = document.getElementById('input-land-pct').value;
+            const propertyType = document.getElementById('input-property-type').value;
+            const businessPct = document.getElementById('input-business-pct').value;
+            const taxRate = document.getElementById('input-tax-rate').value;
+
+            const url = new URL(window.location.href);
+            url.searchParams.set('cost', cost);
+            if (serviceDate) url.searchParams.set('serviceDate', serviceDate);
+            url.searchParams.set('landPct', landPct);
+            url.searchParams.set('propertyType', propertyType);
+            url.searchParams.set('businessPct', businessPct);
+            url.searchParams.set('taxRate', taxRate);
+
+            navigator.clipboard.writeText(url.toString()).then(() => {
+                const btnText = document.getElementById('share-btn-text');
+                btnText.textContent = 'Link Copied!';
+                setTimeout(() => {
+                    btnText.textContent = 'Share';
+                }, 2000);
+            }).catch(err => {
+                console.error('Failed to copy share link: ', err);
+            });
+        }
+
+        function loadFromUrlParams() {
+            const params = new URLSearchParams(window.location.search);
+            if (params.has('cost')) document.getElementById('input-cost').value = params.get('cost');
+            
+            if (params.has('serviceDate')) {
+                document.getElementById('input-service-date').value = params.get('serviceDate');
+            } else {
+                // Default to Jan 1st of current year
+                const currentYear = new Date().getFullYear();
+                document.getElementById('input-service-date').value = `${currentYear}-01-01`;
+            }
+
+            if (params.has('landPct')) {
+                document.getElementById('input-land-pct').value = params.get('landPct');
+            }
+            if (params.has('propertyType')) {
+                document.getElementById('input-property-type').value = params.get('propertyType');
+            }
+            if (params.has('businessPct')) {
+                const val = params.get('businessPct');
+                document.getElementById('input-business-pct').value = val;
+                document.getElementById('slider-business-pct').value = val;
+            }
+            if (params.has('taxRate')) document.getElementById('input-tax-rate').value = params.get('taxRate');
+
+            syncLandPctInput();
+        }
+
+        function calculateAll() {
+            const cost = parseFloat(document.getElementById('input-cost').value) || 0;
+            const serviceDateVal = document.getElementById('input-service-date').value;
+            const landPct = (parseFloat(document.getElementById('input-land-pct').value) || 0) / 100;
+            const propertyType = document.getElementById('input-property-type').value;
+            const businessPct = (parseFloat(document.getElementById('input-business-pct').value) || 0) / 100;
+            const taxRate = (parseFloat(document.getElementById('input-tax-rate').value) || 0) / 100;
+
+            const isResidential = propertyType === 'residential';
+            const recoveryYears = isResidential ? 27.5 : 39;
+            const totalCalendarYears = isResidential ? 28 : 40;
+
+            document.getElementById('land-pct-label').textContent = (landPct * 100).toFixed(1) + '%';
+            document.getElementById('business-use-label').textContent = (businessPct * 100).toFixed(0) + '%';
+            document.getElementById('tax-rate-label').textContent = (taxRate * 100).toFixed(1) + '%';
+
+            const landVal = cost * landPct;
+            const buildingBasis = Math.max(0, cost - landVal);
+            const eligibleBasis = buildingBasis * businessPct;
+
+            // Parse service date and calculate month placed in service
+            const serviceDate = serviceDateVal ? new Date(serviceDateVal + 'T00:00:00') : new Date();
+            const startYear = serviceDate.getFullYear();
+            const monthPlacedInService = serviceDate.getMonth() + 1; // 1-12
+            const currentCalendarYear = new Date().getFullYear();
+
+            const tableBody = document.getElementById('milestones-table-body');
+            tableBody.innerHTML = '';
+
+            let accumDepreciation = 0;
+            let currentYearDeduction = 0;
+
+            for (let i = 1; i <= totalCalendarYears; i++) {
+                const taxYear = startYear + (i - 1);
+                const rate = getMidMonthRate(monthPlacedInService, i, propertyType);
+                const annualDeduction = eligibleBasis * rate;
+                const annualTaxSavings = annualDeduction * taxRate;
+
+                accumDepreciation += annualDeduction;
+                const endingDepreciableBook = Math.max(0, eligibleBasis - accumDepreciation);
+                const endingTotalBook = endingDepreciableBook + landVal + (buildingBasis * (1 - businessPct));
+
+                const isCurrentYear = taxYear === currentCalendarYear;
+                if (isCurrentYear) {
+                    currentYearDeduction = annualDeduction;
+                }
+
+                // Append row
+                const row = document.createElement('tr');
+                row.className = isCurrentYear 
+                    ? 'bg-emerald-950/40 border-l-2 border-emerald-400 hover:bg-emerald-900/30 transition' 
+                    : 'hover:bg-slate-800/30 transition';
+
+                row.innerHTML = `
+                    <td class="py-2 px-3 font-bold text-white flex items-center gap-1.5">
+                        <span>${taxYear}</span>
+                        ${isCurrentYear ? '<span class="text-[9px] px-1.5 py-0.5 rounded bg-emerald-500/20 text-emerald-300 font-mono border border-emerald-500/30">NOW</span>' : ''}
+                    </td>
+                    <td class="py-2 px-3 text-cyan-400">${(rate * 100).toFixed(3)}%</td>
+                    <td class="py-2 px-3 ${isCurrentYear ? 'text-amber-400 font-bold' : 'text-emerald-400'}">${formatCurrency(annualDeduction)}</td>
+                    <td class="py-2 px-3 text-indigo-400">${formatCurrency(annualTaxSavings)}</td>
+                    <td class="py-2 px-3 text-right font-bold text-white">${formatCurrency(endingTotalBook)}</td>
+                `;
+                tableBody.appendChild(row);
+            }
+
+            const totalTaxSavings = eligibleBasis * taxRate;
+            const fullYearAnnualDeduction = eligibleBasis / recoveryYears;
+
+            // Summary Banners
+            document.getElementById('summary-tax-savings').textContent = formatCurrency(totalTaxSavings);
+            document.getElementById('summary-building-basis').textContent = formatCurrency(eligibleBasis);
+            document.getElementById('sum-depreciable-basis').textContent = formatCurrency(eligibleBasis);
+            document.getElementById('sum-land-basis').textContent = formatCurrency(landVal);
+
+            document.getElementById('sum-current-year-label').textContent = `${currentCalendarYear} Write-Off`;
+            document.getElementById('sum-current-year-deduction').textContent = formatCurrency(currentYearDeduction);
+
+            // Sidebar Displays
+            document.getElementById('out-initial-cost').textContent = formatCurrency(cost);
+            document.getElementById('out-land-basis').textContent = formatCurrency(landVal);
+            document.getElementById('out-building-basis').textContent = formatCurrency(buildingBasis);
+            document.getElementById('out-eligible-basis').textContent = formatCurrency(eligibleBasis);
+            document.getElementById('out-current-year-title').textContent = `${currentCalendarYear} Deduction`;
+            document.getElementById('out-current-year-deduction').textContent = formatCurrency(currentYearDeduction);
+            document.getElementById('out-full-year-deduction').textContent = formatCurrency(fullYearAnnualDeduction);
+            document.getElementById('out-tax-savings').textContent = formatCurrency(totalTaxSavings);
+
+            // Bar Breakdown Calculations
+            document.getElementById('bar-class-label').textContent = isResidential ? '27.5-Year Residential SL' : '39-Year Commercial SL';
+            document.getElementById('table-total-years-label').textContent = `${totalCalendarYears} Recovery Years (Mid-Month)`;
+
+            const taxSavingsRatio = cost > 0 ? (totalTaxSavings / cost) * 100 : 0;
+            const netBuildingBasis = Math.max(0, eligibleBasis - totalTaxSavings);
+            const buildingRatio = cost > 0 ? (netBuildingBasis / cost) * 100 : 0;
+            const landRatio = cost > 0 ? (landVal / cost) * 100 : 0;
+
+            document.getElementById('bar-savings').style.width = Math.max(3, taxSavingsRatio) + '%';
+            document.getElementById('bar-building').style.width = Math.max(3, buildingRatio) + '%';
+            document.getElementById('bar-land').style.width = Math.max(3, landRatio) + '%';
+
+            document.getElementById('bar-savings-val').textContent = formatCurrency(totalTaxSavings);
+            document.getElementById('bar-building-val').textContent = formatCurrency(netBuildingBasis);
+            document.getElementById('bar-land-val').textContent = formatCurrency(landVal);
+            document.getElementById('bar-tax-ratio').textContent = `Tax Shield Ratio: ${taxSavingsRatio.toFixed(1)}%`;
+        }
+
+        window.addEventListener('DOMContentLoaded', () => {
+            if (window.lucide) lucide.createIcons();
+            const yearEl = document.getElementById('year');
+            if (yearEl) yearEl.textContent = new Date().getFullYear();
+
+            loadFromUrlParams();
+            calculateAll();
+        });
+    </script>
+</body>
+</html>
